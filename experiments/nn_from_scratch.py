@@ -47,7 +47,9 @@ class Neuron:
         self.bias = 0.0
 
         # caches
+        # z = wx + b后的一个实数
         self.z_cache = None
+        # 一个结果
         self.inputs_cache = None
 
     def forward(self, inputs):

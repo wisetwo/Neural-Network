@@ -1,0 +1,7 @@
+# misc
+.DS_Store
+.idea
+.VSCodeCounter
+
+# code editor setting
+/.vscode
