@@ -192,4 +192,6 @@ def inference(x, y):
 
 
 train(2000, learning_rate=10)
-inference(1, 2)
+b = inference(1, 2)
+
+print('b = ', b)
