@@ -5,3 +5,6 @@
 
 # code editor setting
 /.vscode
+
+# temp files
+/results
