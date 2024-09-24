@@ -10,7 +10,21 @@ def o(x, y):
 # >>>[(x,y) for x in range(0,3) for y in range(0,2)]
 # [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (2, 1)]
 
-# samples
+# samples - 生成
+# print(type(xs))  # 输出：<class 'list'>
+
+# # 确定长度
+# >>> print(len(xs))  # 输出：121, 11 * 11
+# >>> print(len(xs[0]))
+
+# # 确定内部元素类型
+# element_types = [type(element) for element in xs]
+# [<class 'list'>, ...]
+# >>> [x for x in range(11)]
+# [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+# >>> [x for x in range(0, 11)]
+# [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
 sample_density = 10
 xs = [
     [-2.0 + 4 * x/sample_density, -2.0 + 4 * y/sample_density]
@@ -27,7 +41,7 @@ dataset = [
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))
 
-# 激活函数的导数
+# 激活函数的导数，由数学公式可推导
 def sigmoid_derivative(x):
     _output = sigmoid(x)
     return _output * (1 - _output)
@@ -36,7 +50,7 @@ def sigmoid_derivative(x):
 seed(0)
 # 固定随机种子，固定random按顺序调用时的输出值
 # >>> seed(0)
-# >>> [random() for x in range(0,5)]
+# >>> [random() for x in range(0, 5)]
 # [0.8444218515250481, 0.7579544029403025, 0.420571580830845, 0.25891675029296335, 0.5112747213686085]
 
 # neural network
@@ -90,11 +104,13 @@ class Neuron:
 
 class MyNet:
     def __init__(self, num_inputs, hidden_shapes):
+        # 实际hidden_shapes = [4]
         # >>> [4] + [1]
-        # [4, 1]
+        # [4, 1] 即隐藏+输出层的神经元个数
         layer_shapes = hidden_shapes + [1]
+        # 实际num_inputs = 2
         # >>> [2] + [4]
-        # [2, 4]
+        # [2, 4] 即输入+隐藏层的神经元个数
         input_shapes = [num_inputs] + hidden_shapes
         self.layers = [
             [
@@ -192,6 +208,8 @@ def inference(x, y):
 
 
 train(2000, learning_rate=10)
-b = inference(1, 2)
 
-print('b = ', b)
+# 测试模型结果
+test_result = inference(1, 2)
+
+print('test_result = ', test_result)
