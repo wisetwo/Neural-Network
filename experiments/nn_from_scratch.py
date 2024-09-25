@@ -4,21 +4,21 @@ from random import seed, random
 
 # the objective function
 # x^2 + y^2 < 1时为1，否则为0
-def o(x, y):
+def objective_fn(x, y):
     return 1.0 if x*x + y*y < 1 else 0.0
 
 # >>>[(x,y) for x in range(0,3) for y in range(0,2)]
 # [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (2, 1)]
 
 # samples - 生成
-# print(type(xs))  # 输出：<class 'list'>
+# print(type(sample_list))  # 输出：<class 'list'>
 
 # # 确定长度
-# >>> print(len(xs))  # 输出：121, 11 * 11
-# >>> print(len(xs[0]))
+# >>> print(len(sample_list))  # 输出：121, 11 * 11
+# >>> print(len(sample_list[0]))
 
 # # 确定内部元素类型
-# element_types = [type(element) for element in xs]
+# element_types = [type(element) for element in sample_list]
 # [<class 'list'>, ...]
 # >>> [x for x in range(11)]
 # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -26,14 +26,14 @@ def o(x, y):
 # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 sample_density = 10
-xs = [
+sample_list = [
     [-2.0 + 4 * x/sample_density, -2.0 + 4 * y/sample_density]
     for x in range(sample_density+1)
     for y in range(sample_density+1)
 ]
 dataset = [
-    (x, y, o(x, y))
-    for x, y in xs
+    (x, y, objective_fn(x, y))
+    for x, y in sample_list
 ]
 
 
@@ -46,12 +46,20 @@ def sigmoid_derivative(x):
     _output = sigmoid(x)
     return _output * (1 - _output)
 
+# loss function
+def square_loss(predict, target):
+    return (predict-target)**2
+
+# loss function的导数
+def square_loss_derivative(predict, target):
+    return 2 * (predict-target)
+
 
 seed(0)
 # 固定随机种子，固定random按顺序调用时的输出值
 # >>> seed(0)
 # >>> [random() for x in range(0, 5)]
-# [0.8444218515250481, 0.7579544029403025, 0.420571580830845, 0.25891675029296335, 0.5112747213686085]
+# [0.8444218515250481, 0.7579544029403025, 0.420571580830845, 0.25891675029296335, 0.5112747213686085] # 固定输出这些值
 
 # neural network
 class Neuron:
@@ -79,6 +87,7 @@ class Neuron:
         # sigmoid(wx + b)
         return sigmoid(self.z_cache)
 
+    # 梯度清零
     def zero_grad(self):
         # 偏导数
         self.d_weights = [0.0 for w in self.weights]
@@ -108,7 +117,7 @@ class MyNet:
         # >>> [4] + [1]
         # [4, 1] 即隐藏+输出层的神经元个数
         layer_shapes = hidden_shapes + [1]
-        # 实际num_inputs = 2
+        # 实际num_inputs = 2，即维度数量
         # >>> [2] + [4]
         # [2, 4] 即输入+隐藏层的神经元个数
         input_shapes = [num_inputs] + hidden_shapes
@@ -162,54 +171,49 @@ class MyNet:
                 for layer in self.layers]
 
 
-# loss function
-def square_loss(predict, target):
-    return (predict-target)**2
 
-
-def square_loss_derivative(predict, target):
-    return 2 * (predict-target)
 
 
 # build neural network
 # 输入2个变量，一层隐藏层，含4个神经元
-net = MyNet(2, [4])
+myNetIns = MyNet(2, [4])
 
 # 未经训练的神经网络
-print(net.forward([0, 0]))
+print(myNetIns.forward([0, 0]))
+# 标准答案集
 targets = [z for x, y, z in dataset]
 
 
-# train
-def one_step(learning_rate):
-    net.zero_grad()
+# train one step
+def one_step_in_train(learning_rate):
+    myNetIns.zero_grad()
 
     loss = 0.0
     num_samples = len(dataset)
     for x, y, z in dataset:
-        predict = net.forward([x, y])
+        predict = myNetIns.forward([x, y])
         loss += square_loss(predict, z)
 
-        net.backward(square_loss_derivative(predict, z) / num_samples)
+        myNetIns.backward(square_loss_derivative(predict, z) / num_samples)
 
-    net.update_params(learning_rate)
+    myNetIns.update_params(learning_rate)
     return loss / num_samples
 
 
-def train(epoch, learning_rate):
+def train_process(epoch, learning_rate):
     for i in range(epoch):
-        loss = one_step(learning_rate)
+        loss = one_step_in_train(learning_rate)
         if i == 0 or (i + 1) % 100 == 0:
             print(f"{i + 1} {loss:.4f}")
 
 
 def inference(x, y):
-    return net.forward([x, y])
+    return myNetIns.forward([x, y])
 
 
-train(2000, learning_rate=10)
+train_process(2000, learning_rate=10)
 
 # 测试模型结果
-test_result = inference(1, 2)
+# test_result = inference(1, 2)
 
-print('test_result = ', test_result)
+# print('test_result = ', test_result)
